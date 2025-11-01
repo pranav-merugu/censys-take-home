@@ -98,6 +98,7 @@ go test -v
 
 - **Add data persistence** - Implement disk-based storage or integrate with a database to persist data across restarts
 - **Add authentication and authorization** - Secure the API endpoints with API keys or OAuth to control access
+- **Add value modification endpoint** - Implement a PUT endpoint to update existing key values without requiring deletion and re-creation
 
 ## Implementation Details
 
