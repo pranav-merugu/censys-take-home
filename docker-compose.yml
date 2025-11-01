@@ -1,0 +1,19 @@
+services:
+  kv-service:
+    build:
+      context: .
+      dockerfile: ./kv-service/Dockerfile
+    ports:
+      - "50051:50051"
+
+  api-service:
+    build:
+      context: .
+      dockerfile: ./api-service/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - KV_SERVICE_ADDR=kv-service:50051
+    depends_on:
+      - kv-service
+
