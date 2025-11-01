@@ -1,5 +1,7 @@
 # Censys Take Home Assignment
 
+A distributed key-value store built with Go, featuring a gRPC backend service and a REST API gateway.
+
 ## Architecture
 
 ```
@@ -25,9 +27,9 @@
          └──────────────────────┘
 ```
 
-## Usage
+## How to Run the Project
 
-### Option 1: Run code
+### Option 1: Run Locally with Go
 
 Run the KV Store server:
 
@@ -39,7 +41,7 @@ go run .
 Run the REST API server:
 
 ```bash
-cd ../api-service
+cd api-service
 go run .
 ```
 
@@ -52,9 +54,15 @@ docker compose build
 docker compose up
 ```
 
-## Testing
+The REST APIs will be available at `localhost:8080`.
 
-To verify that everything is working, you can run the automated tests:
+### Available Endpoints
+
+- `GET /kv/:key` - Retrieve a value by key
+- `POST /kv` - Store a key-value pair (Request body: `{"key": "...", "value": "..."}`)
+- `DELETE /kv/:key` - Delete a key-value pair
+
+## Testing Instructions
 
 Run all tests (unit tests and integration tests):
 
@@ -62,16 +70,14 @@ Run all tests (unit tests and integration tests):
 go test ./...
 ```
 
-Run unit tests for the KV Store server:
+Run unit tests for individual services:
 
 ```bash
+# KV Store server
 cd kv-service
 go test -v
-```
 
-Run unit tests for the REST API server:
-
-```bash
+# REST API server
 cd api-service
 go test -v
 ```
@@ -83,36 +89,20 @@ cd tests
 go test -v
 ```
 
-Once the services are running (via Option 1 or 2 above), the REST APIs are available at `localhost:8080`. You can make separate API calls to test manually.
+## Assumptions Made During Development
 
-The available endpoints are:
+- **Data persistence is not required** - The key-value store uses an in-memory map, so data is lost when the service restarts
+- **No authentication required** - The API endpoints are publicly accessible without any authentication or authorization mechanisms
 
-- `/kv/:key` GET request
-- `/kv` POST request: Request body needs a "key" and "value"
-- `/kv/:key` DELETE request
+## Future Improvements
 
-## Implementation
+- **Add data persistence** - Implement disk-based storage or integrate with a database to persist data across restarts
+- **Add authentication and authorization** - Secure the API endpoints with API keys or OAuth to control access
 
-For the REST API server, I used the Gin framework. The server simply creates 3 endpoints. When these endpoints are called, it uses gRPC to communicate with the storage server.
+## Implementation Details
 
-For the KV Store server, the Key-Value store logic is handled with a simple map structure. The server is a gRPC server and accepts messages specified in the `proto/kvstore.proto` file.
+For the REST API server, I used the Gin framework. The server creates 3 endpoints that communicate with the storage server using gRPC.
 
-To setup the gRPC communication, I followed some guides online as it required many specific commands and files.
+For the KV Store server, the key-value store logic is handled with a simple map structure. The server is a gRPC server and accepts messages specified in the `proto/kvstore.proto` file.
 
-To handle concurrency, the KV Store server uses a read write mutex, allowing for multiple simultaneous reads or a single write at a time. This avoids running into issues of race conditions if multiple requests are made simultaneously.
-
-Note that the data in the KV Store server is not persisted.
-
-## Goal
-
-Build a simple decomposed Key-Value store by implementing two services which communicate over gRPC.
-
-The first service should implement a basic JSON Rest API to serve as the primary public interface. This service should then externally communicate with a second service over gRPC, which implement a basic Key-Value store service that can:
-
-1. Store a value at a given key
-2. Retrieve the value for a given key
-3. Delete a given key
-
-The JSON interface should at a minimum be able to expose and implement these three functions.
-
-You can write this in whichever languages you choose, however Go would be preferred. Ideally, the final result should be built into two separate Docker containers which can be used to run each service independently.
+To handle concurrency, the KV Store server uses a read-write mutex, allowing for multiple simultaneous reads or a single write at a time. This avoids race conditions if multiple requests are made simultaneously.
