@@ -45,8 +45,6 @@ go run .
 
 ### Option 2: Docker
 
-Note that the Docker container worked on my machine with Go version go1.24.4 darwin/arm64 on an ARM64 architecture Mac.
-
 In the project root folder, run:
 
 ```bash
@@ -56,16 +54,36 @@ docker compose up
 
 ## Testing
 
-Once one of the above options is complete, both the server that handles key value storage and the server that handles REST APIs are running. The REST APIs are available at `localhost:8080`
+To verify that everything is working, you can run the automated tests:
 
-To test that things are working, run the provided test file:
+Run all tests (unit tests and integration tests):
+
+```bash
+go test ./...
+```
+
+Run unit tests for the KV Store server:
+
+```bash
+cd kv-service
+go test -v
+```
+
+Run unit tests for the REST API server:
+
+```bash
+cd api-service
+go test -v
+```
+
+Run integration tests:
 
 ```bash
 cd tests
-go run .
+go test -v
 ```
 
-You can also make separate API calls to `localhost:8080`.
+Once the services are running (via Option 1 or 2 above), the REST APIs are available at `localhost:8080`. You can make separate API calls to test manually.
 
 The available endpoints are:
 
